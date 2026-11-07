@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSP 값은 빌드할 때 electron.vite.config.ts의 플러그인이 채운다 -->
+    <meta http-equiv="Content-Security-Policy" content="__APP_CSP__" />
+    <title>필로소피 Claude 작업실</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@import "@xterm/xterm/css/xterm.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 색은 변수로 정의하고, 밝은/어두운 테마에서 값만 바꾼다. (WCAG AA 대비를 맞춘 값) */
+:root {
+  --app-bg: #f6f6f3;
+  --app-panel: #ffffff;
+  --app-panel-2: #eeeee9;
+  --app-fg: #1d1f24;
+  --app-muted: #4f5561;
+  --app-line: #d3d4cf;
+  --app-accent: #8a5a00;
+  --app-accent-fg: #ffffff;
+  --app-accent-soft: #f6e8c8;
+  --app-danger: #b42318;
+  --app-ok: #1f7a3a;
+  --app-focus: #2563eb;
+  --ui-scale: 1;
+  color-scheme: light;
+}
+
+.dark {
+  --app-bg: #16181d;
+  --app-panel: #1e2128;
+  --app-panel-2: #272b33;
+  --app-fg: #eceef2;
+  --app-muted: #b2b8c3;
+  --app-line: #3a3f4a;
+  --app-accent: #e5b34b;
+  --app-accent-fg: #1b1d23;
+  --app-accent-soft: #3d3220;
+  --app-danger: #ff8a80;
+  --app-ok: #7bd88f;
+  --app-focus: #8ab4ff;
+  color-scheme: dark;
+}
+
+@theme {
+  --color-bg: var(--app-bg);
+  --color-panel: var(--app-panel);
+  --color-panel-2: var(--app-panel-2);
+  --color-fg: var(--app-fg);
+  --color-muted: var(--app-muted);
+  --color-line: var(--app-line);
+  --color-accent: var(--app-accent);
+  --color-accent-fg: var(--app-accent-fg);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-danger: var(--app-danger);
+  --color-ok: var(--app-ok);
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Noto Sans KR", system-ui, sans-serif;
+  --font-mono: "D2Coding", "Cascadia Mono", "Consolas", "Menlo", "Noto Sans Mono CJK KR", monospace;
+}
+
+/* 본문 기본 16px. 설정의 "화면 글자" 배율이 rem 전체에 적용된다. */
+html {
+  font-size: calc(16px * var(--ui-scale));
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-fg);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+:focus-visible {
+  outline: 3px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+.xterm {
+  padding: 6px;
+  height: 100%;
+}
+.xterm-viewport {
+  scrollbar-width: thin;
+}
+/* xterm 기본 CSS는 스크롤 영역을 검게 칠한다. 테마 배경이 보이도록 투명하게 */
+.xterm .xterm-viewport {
+  background-color: transparent !important;
+}
