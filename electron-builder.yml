@@ -3,6 +3,13 @@ appId: kr.philosophyai.claude-workroom
 productName: 필로소피 Claude 작업실
 copyright: Copyright © 2026 Philosophy AI Education
 
+# GitHub Releases에 설치 파일을 올린다 (.github/workflows/release.yml에서 사용).
+publish:
+  provider: github
+  owner: philosophyAIEDU
+  repo: 261107claudeworkspace
+  releaseType: release
+
 directories:
   output: release
   buildResources: build
@@ -30,7 +37,8 @@ win:
   target:
     - target: nsis
       arch: [x64]
-  artifactName: "PhilosophyClaudeWorkroom-Setup-${version}.${ext}"
+  # 버전 번호를 파일 이름에 넣지 않아야 소개 페이지의 "최신 버전 받기" 링크가 항상 같은 주소를 쓸 수 있다.
+  artifactName: "PhilosophyClaudeWorkroom-Setup.${ext}"
 
 nsis:
   oneClick: false
@@ -47,7 +55,7 @@ mac:
     - target: dmg
       arch: [x64, arm64]
   category: public.app-category.education
-  artifactName: "PhilosophyClaudeWorkroom-${version}-${arch}.${ext}"
+  artifactName: "PhilosophyClaudeWorkroom-mac-${arch}.${ext}"
   # 코드 서명이 없을 때도 빌드되도록 (서명은 인증서가 준비된 뒤에)
   identity: null
 
@@ -57,4 +65,4 @@ dmg:
 linux:
   target: [AppImage]
   category: Education
-  artifactName: "PhilosophyClaudeWorkroom-${version}.${ext}"
+  artifactName: "PhilosophyClaudeWorkroom-linux.${ext}"

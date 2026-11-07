@@ -1,0 +1,36 @@
+# Netlify 배포 설정: 다운로드 소개 페이지(site/)만 올린다.
+# 데스크톱 앱 자체는 내 컴퓨터에서만 동작하므로 Netlify에서 빌드하지 않는다.
+[build]
+  base = "site"
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# 짧은 주소로 바로 받기: /download/windows, /download/mac-arm64, /download/mac-x64
+[[redirects]]
+  from = "/download/windows"
+  to = "https://github.com/philosophyAIEDU/261107claudeworkspace/releases/latest/download/PhilosophyClaudeWorkroom-Setup.exe"
+  status = 302
+
+[[redirects]]
+  from = "/download/mac-arm64"
+  to = "https://github.com/philosophyAIEDU/261107claudeworkspace/releases/latest/download/PhilosophyClaudeWorkroom-mac-arm64.dmg"
+  status = 302
+
+[[redirects]]
+  from = "/download/mac-x64"
+  to = "https://github.com/philosophyAIEDU/261107claudeworkspace/releases/latest/download/PhilosophyClaudeWorkroom-mac-x64.dmg"
+  status = 302

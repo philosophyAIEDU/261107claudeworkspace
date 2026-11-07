@@ -57,8 +57,8 @@ npm run dist:mac    # macOS 설치 파일 (.dmg) — 맥에서 실행해야 해�
 ```
 
 - 결과 파일은 **`release/`** 폴더에 생겨요.
-  - Windows: `release/PhilosophyClaudeWorkroom-Setup-0.1.0.exe`
-  - macOS: `release/PhilosophyClaudeWorkroom-0.1.0-arm64.dmg` (애플 실리콘), `…-x64.dmg` (인텔)
+  - Windows: `release/PhilosophyClaudeWorkroom-Setup.exe`
+  - macOS: `release/PhilosophyClaudeWorkroom-mac-arm64.dmg` (애플 실리콘), `PhilosophyClaudeWorkroom-mac-x64.dmg` (인텔)
 - Windows 설치 파일은 Windows에서 만드는 것이 가장 쉬워요. (macOS·Linux에서 만들려면 Wine이 필요해요)
 
 ### 서명 없는 앱 실행 경고 넘기기

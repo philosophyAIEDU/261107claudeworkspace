@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>필로소피 Claude 작업실</title>
+    <meta name="description" content="Claude Code를 위한 한국어 작업실. 어느 폴더에서 어떤 대화를 했는지 기억해 두었다가, 클릭 한 번으로 이어서 작업해요." />
+    <meta property="og:title" content="필로소피 Claude 작업실" />
+    <meta property="og:description" content="Claude Code를 위한 한국어 작업실 — 작업 폴더와 대화를 기억하고 바로 이어서 작업해요." />
+    <meta property="og:image" content="/images/workspace.png" />
+    <meta property="og:type" content="website" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#download">다운로드로 바로 가기</a>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/">🦉 필로소피 Claude 작업실</a>
+        <nav aria-label="페이지 안 메뉴">
+          <a href="#features">할 수 있는 일</a>
+          <a href="#download">다운로드</a>
+          <a href="#start">시작하기</a>
+          <a href="#faq">자주 묻는 질문</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <p class="eyebrow">Claude Code를 쓰는 선생님을 위한 한국어 작업실</p>
+          <h1>“예전에 어느 폴더에서<br />작업했더라?”는 이제 그만.</h1>
+          <p class="lead">
+            작업 폴더와 Claude와 나눈 대화를 모두 기억해 두었다가,<br class="br-wide" />
+            처음 화면에서 <strong>[▶ 이어서 작업하기]</strong> 한 번으로 돌아가요.
+          </p>
+          <div class="cta">
+            <a class="btn btn-primary" id="hero-download" href="#download">⬇ 무료로 내려받기</a>
+            <a class="btn" href="#start">처음 써 보기 4단계</a>
+          </div>
+          <p class="small muted">Windows 10/11 · macOS · 무료 · AI 이용 요금은 사용 중인 Claude 요금제를 그대로 써요</p>
+          <figure class="shot shot-hero">
+            <img src="/images/workspace.png" width="1400" height="880" alt="작업 화면: 왼쪽에 폴더별 대화 목록, 가운데에 지난 대화를 말풍선으로 보여 주는 기록, 오른쪽에 Claude 터미널과 한글 입력창이 있어요." />
+          </figure>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <div class="wrap">
+          <h2>이 앱으로 할 수 있는 일</h2>
+          <div class="grid3">
+            <article class="card">
+              <div class="icon" aria-hidden="true">📂</div>
+              <h3>폴더와 대화를 기억해요</h3>
+              <p>어느 폴더에서 어떤 대화를 했는지 목록으로 남아요. 폴더 카드에 마지막 작업 시각, 대화 수, 최근 대화 제목이 보여요.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true">▶</div>
+              <h3>누르면 바로 이어서</h3>
+              <p>대화를 누르면 지난 이야기를 말풍선으로 보여 주고, 버튼 하나로 그 대화를 그 폴더에서 그대로 이어 가요.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true">⌨️</div>
+              <h3>한글이 깨지지 않아요</h3>
+              <p>터미널 아래 한글 입력창에 쓰고 [보내기]만 누르면 돼요. 여러 줄도 한 번에, 자주 쓰는 문장은 버튼으로.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true">🗂️</div>
+              <h3>IDE처럼 파일도 함께</h3>
+              <p>파일 탐색기와 편집기가 들어 있어요. Claude가 방금 고친 파일에는 <strong>● 방금 바뀜</strong> 표시가 붙어요.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true">📥</div>
+              <h3>예전 작업도 불러와요</h3>
+              <p>다른 IDE 터미널에서 Claude Code로 작업했던 폴더와 대화도 찾아서 목록에 넣어 줘요.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true">🔒</div>
+              <h3>내 컴퓨터 안에서만</h3>
+              <p>API 키를 받지 않고, 대화 내용을 밖으로 보내지 않아요. 분석·추적 기능도 없어요. 로그인은 Claude Code가 직접 해요.</p>
+            </article>
+          </div>
+
+          <div class="split">
+            <figure class="shot">
+              <img src="/images/home.png" width="1400" height="880" loading="lazy" alt="처음 화면: 최근 작업 폴더 카드마다 [이어서 작업하기], [새 대화], [폴더만 열기] 버튼이 있어요." />
+              <figcaption>처음 화면 — 폴더 카드에서 바로 이어서 작업해요</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="/images/editor.png" width="1400" height="880" loading="lazy" alt="편집기 화면: Claude가 파일을 고치면 '새로 불러올까요?' 안내가 뜨고, 파일 목록에 '방금 바뀜' 표시가 붙어요." />
+              <figcaption>편집기 — Claude가 고친 파일을 바로 알려 줘요</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="section alt">
+        <div class="wrap">
+          <h2>내려받기</h2>
+          <p class="muted">내 컴퓨터에 맞는 파일을 골라요. <span id="os-hint"></span></p>
+          <div class="grid3 downloads">
+            <a class="dl" data-os="win" href="/download/windows">
+              <span class="dl-icon" aria-hidden="true">🪟</span>
+              <span class="dl-title">Windows 10/11</span>
+              <span class="dl-sub">설치 파일 (.exe)</span>
+            </a>
+            <a class="dl" data-os="mac-arm" href="/download/mac-arm64">
+              <span class="dl-icon" aria-hidden="true">🍎</span>
+              <span class="dl-title">macOS · 애플 실리콘</span>
+              <span class="dl-sub">M1·M2·M3·M4 맥 (.dmg)</span>
+            </a>
+            <a class="dl" data-os="mac-intel" href="/download/mac-x64">
+              <span class="dl-icon" aria-hidden="true">🍏</span>
+              <span class="dl-title">macOS · 인텔</span>
+              <span class="dl-sub">2020년 이전 맥 (.dmg)</span>
+            </a>
+          </div>
+          <p class="small muted">
+            맥 종류는 화면 왼쪽 위 사과 메뉴 → <strong>이 Mac에 관하여</strong>의 “칩” 또는 “프로세서”에서 확인해요. 모든 버전은
+            <a href="https://github.com/philosophyAIEDU/261107claudeworkspace/releases">GitHub 릴리스 페이지</a>에 있어요.
+          </p>
+
+          <details class="warn">
+            <summary>⚠️ 처음 실행할 때 경고 창이 떠요 (괜찮아요)</summary>
+            <p>아직 코드 서명이 되어 있지 않아서 운영체제가 확인 창을 보여 줘요. 아래처럼 실행하면 돼요.</p>
+            <div class="grid2">
+              <div>
+                <h3>Windows — “Windows의 PC 보호”</h3>
+                <ol>
+                  <li>파란 창 안의 <strong>[추가 정보]</strong>를 눌러요.</li>
+                  <li>아래에 생긴 <strong>[실행]</strong>을 눌러요.</li>
+                  <li>설치 마법사에서 [설치]를 눌러요.</li>
+                </ol>
+              </div>
+              <div>
+                <h3>macOS — “열 수 없음”</h3>
+                <ol>
+                  <li>dmg를 열고 앱을 <strong>응용 프로그램</strong> 폴더로 끌어 놓아요.</li>
+                  <li>앱을 <strong>Control 키를 누른 채 클릭</strong>하고 <strong>[열기]</strong>를 골라요.</li>
+                  <li>그래도 안 되면 <strong>시스템 설정 → 개인정보 보호 및 보안</strong>에서 <strong>[그래도 열기]</strong>를 눌러요.</li>
+                </ol>
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="start" class="section">
+        <div class="wrap">
+          <h2>처음 써 보기 4단계</h2>
+          <ol class="steps">
+            <li>
+              <h3>Claude Code 설치하기</h3>
+              <p>이 앱은 내 컴퓨터의 Claude Code를 편하게 쓰도록 돕는 도구예요. 먼저 Claude Code를 설치해요. (앱을 켜면 설치되어 있는지 자동으로 확인해 줘요)</p>
+              <div class="code-row">
+                <span class="code-label">Windows (PowerShell)</span>
+                <code id="cmd-win">irm https://claude.ai/install.ps1 | iex</code>
+                <button type="button" class="copy" data-copy="cmd-win">복사</button>
+              </div>
+              <div class="code-row">
+                <span class="code-label">macOS (터미널)</span>
+                <code id="cmd-mac">curl -fsSL https://claude.ai/install.sh | bash</code>
+                <button type="button" class="copy" data-copy="cmd-mac">복사</button>
+              </div>
+              <p class="small muted">자세한 안내: <a href="https://code.claude.com/docs/en/setup">Claude Code 공식 설치 문서</a></p>
+            </li>
+            <li>
+              <h3>앱을 설치하고 폴더 열기</h3>
+              <p>처음 화면에서 <strong>[📁 폴더 열기]</strong>로 기존 폴더를 고르거나, <strong>[➕ 새 작업 폴더 만들기]</strong>로 이름만 써서 새로 만들어요.</p>
+            </li>
+            <li>
+              <h3>새 대화로 작업하기</h3>
+              <p>오른쪽 클로드 패널의 <strong>[＋ 새 대화]</strong>를 누르고(처음이면 안내에 따라 로그인), 아래 한글 입력창에 할 일을 쓰고 <strong>[보내기]</strong>를 눌러요.</p>
+            </li>
+            <li>
+              <h3>다음에는 이어서</h3>
+              <p>다음에 앱을 켜면 처음 화면의 폴더 카드에서 <strong>[▶ 이어서 작업하기]</strong>만 누르면 돼요.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="faq" class="section alt">
+        <div class="wrap narrow">
+          <h2>자주 묻는 질문</h2>
+          <details>
+            <summary>돈이 드나요?</summary>
+            <p>앱은 무료예요. Claude를 쓰는 요금은 지금 쓰고 있는 Claude 요금제(또는 API 사용량)를 그대로 써요. 이 앱이 따로 요금을 받거나 API 키를 묻지 않아요.</p>
+          </details>
+          <details>
+            <summary>개발자가 아니어도 쓸 수 있나요?</summary>
+            <p>네. 모든 메뉴와 안내가 쉬운 한국어로 되어 있고, 어려운 말 옆에는 (?) 설명이 붙어 있어요. 도움말에는 용어 사전과 자주 쓰는 Claude 명령어 설명도 있어요.</p>
+          </details>
+          <details>
+            <summary>예전에 다른 IDE(안티그래비티, VS Code 등)에서 한 대화도 볼 수 있나요?</summary>
+            <p>네. 처음 실행할 때 “예전 작업 불러오기”에서 Claude Code로 작업했던 폴더를 찾아 보여 줘요. 체크하고 추가하면 그 폴더의 대화가 모두 목록에 들어와요.</p>
+          </details>
+          <details>
+            <summary>폴더를 옮겼더니 이어서 하기가 안 돼요.</summary>
+            <p>Claude Code의 대화 기록은 처음 대화를 시작한 폴더 위치에 묶여 있어요. 처음 화면의 폴더 카드에서 <strong>[📍 새 위치 지정]</strong>으로 옮긴 폴더를 골라 주세요.</p>
+          </details>
+          <details>
+            <summary>대화 내용이 인터넷 어딘가에 저장되나요?</summary>
+            <p>이 앱은 대화 내용을 어디에도 보내지 않아요. 대화는 Claude Code가 평소처럼 처리하고, 기록은 내 컴퓨터에 남아요. 이 앱은 그 기록의 목록(색인)만 내 컴퓨터에 저장해요.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <p>🦉 필로소피 Claude 작업실 · 필로소피 AI 교육</p>
+        <p class="small muted">Claude와 Claude Code는 Anthropic의 상표예요. 이 앱은 Anthropic이 만든 공식 제품이 아니에요.</p>
+      </div>
+    </footer>
+
+    <script src="/main.js" defer></script>
+  </body>
+</html>
