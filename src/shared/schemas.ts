@@ -121,6 +121,12 @@ export const ipcRequestSchemas = {
   'app:cancelQuit': z.void(),
   'setup:checkClaude': z.void(),
   'setup:pickClaudePath': z.void(),
+  'setup:runInstaller': z.object({
+    tabId: z.uuid(),
+    cols: z.number().int().min(10).max(1000),
+    rows: z.number().int().min(4).max(500),
+  }),
+  'setup:fixPath': z.void(),
   'settings:get': z.void(),
   'settings:update': appSettingsSchema.partial(),
   'settings:pickFolder': z.void(),

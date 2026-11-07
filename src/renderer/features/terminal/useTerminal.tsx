@@ -52,7 +52,8 @@ export function TerminalProvider({ children }: { children: ReactNode }): React.J
   // 화면을 새로 고쳤을 때 이미 실행 중인 대화 탭을 되살린다.
   useEffect(() => {
     void (async () => {
-      const list = await api().invoke('pty:list', undefined).catch(() => [] as PtyTabInfo[]);
+      // 설치용 터미널은 대화 탭이 아니므로 빼고 되살린다.
+      const list = (await api().invoke('pty:list', undefined).catch(() => [] as PtyTabInfo[])).filter((t) => t.kind !== 'installer');
       if (!list.length) return;
       for (const t of list) {
         const entry = ensureTerm(t.tabId);

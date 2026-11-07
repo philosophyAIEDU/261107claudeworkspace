@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import type { AppSettings, FontScale } from '../../shared/types';
+import type { AppSettings, ClaudeCheckResult, FontScale } from '../../shared/types';
 import { ko } from '../i18n/ko';
 import { api } from '../lib/api';
 import { useApp } from '../context/AppContext';
@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import { HelpTip } from '../components/Tooltip';
 import { Modal } from '../components/Modal';
 import { ImportPanel } from '../features/sessions/ImportPanel';
+import { ClaudePathStatus } from '../features/setup/ClaudePathStatus';
 
 function Section({ title, children }: { title: string; children: ReactNode }): React.JSX.Element {
   return (
@@ -56,6 +57,7 @@ export function SettingsPage(): React.JSX.Element {
   const [phrases, setPhrases] = useState('');
   const [importOpen, setImportOpen] = useState(false);
   const [claudeInfo, setClaudeInfo] = useState<string>('');
+  const [claudeCheck, setClaudeCheck] = useState<ClaudeCheckResult | null>(null);
 
   useEffect(() => {
     if (settings) setPhrases(settings.quickPhrases.join('\n'));
@@ -64,6 +66,10 @@ export function SettingsPage(): React.JSX.Element {
   useEffect(() => {
     void api()
       .invoke('setup:checkClaude', undefined)
+      .then((r) => {
+        setClaudeCheck(r);
+        return r;
+      })
       .then((r) => setClaudeInfo(r.found ? `${ko.setup.found(r.version ?? '?')} — ${r.path ?? ''}` : (r.error ?? ko.setup.notFoundTitle)))
       .catch(() => undefined);
   }, [settings?.claudePath]);
@@ -89,6 +95,7 @@ export function SettingsPage(): React.JSX.Element {
             onReset={settings.claudePath ? () => set({ claudePath: '' }) : undefined}
           />
           <p className="text-sm text-muted">{claudeInfo}</p>
+          {claudeCheck && <ClaudePathStatus check={claudeCheck} />}
         </Section>
 
         <Section title={ko.settings.folderSection}>

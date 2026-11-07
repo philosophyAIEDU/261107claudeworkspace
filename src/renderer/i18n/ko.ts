@@ -86,6 +86,32 @@ export const ko = {
     sessionsCount: (n: number) => `대화 ${n}개`,
     start: '시작하기 →',
     ptyMissing: '터미널 기능을 불러오지 못했어요. 앱을 다시 설치해 보세요.',
+    autoInstall: '🪄 자동으로 설치하기',
+    autoInstallHelp: '공식 설치 명령을 이 앱 안의 터미널에서 대신 실행해요. 명령을 복사하거나 PATH를 직접 고칠 필요가 없어요.',
+    manualInstall: '직접 설치하는 방법 보기',
+    installerTitle: 'Claude Code 설치',
+    installerIntro: '아래 공식 설치 명령을 이 앱 안의 터미널에서 실행해요. 1~3분쯤 걸려요.',
+    installerWhy: [
+      'Windows는 64비트 PowerShell로 실행해요(32비트 PowerShell에서는 설치가 실패해요).',
+      '이번 실행에만 스크립트 실행을 허용해서, 학교·회사 PC의 보안 정책에 막히지 않아요.',
+      '설치가 끝나면 PATH와 상관없이 이 앱이 claude를 바로 찾아요.',
+    ],
+    installerStart: '설치 시작',
+    installerRunning: '설치하는 중이에요… 창을 닫지 마세요.',
+    installerDone: '✅ 설치가 끝났어요.',
+    installerFailed: (code: number) => `설치가 끝났지만 문제가 있었을 수 있어요 (종료 코드 ${code}). 위 터미널의 메시지를 확인해 주세요.`,
+    installerChecking: '설치됐는지 확인하는 중이에요…',
+    installerNotFound: '설치 명령은 끝났지만 claude를 찾지 못했어요. 위 메시지를 확인하고 [다시 확인]을 눌러 보세요.',
+    pathOk: '✅ 다른 프로그램(안티그래비티 등)의 터미널에서도 claude를 쓸 수 있어요. (PATH에 등록됨)',
+    pathMissingTitle: '⚠️ 이 앱에서는 바로 쓸 수 있지만, 다른 프로그램의 터미널에서는 아직 안 돼요',
+    pathMissingBody: (dir: string) =>
+      `Claude Code가 들어 있는 폴더(${dir})가 PATH에 등록되어 있지 않아요. 공식 설치 프로그램은 PATH를 자동으로 고치지 않기 때문이에요. 그래서 안티그래비티·VS Code 등의 터미널에서 claude를 입력하면 "인식되지 않는 명령"이라고 나와요.`,
+    pathFix: '🔧 PATH에 등록하기',
+    pathFixHelp: '공식 문서와 같은 방법으로 사용자 PATH에 이 폴더를 추가해요. 관리자 권한은 필요 없어요.',
+    pathFixed: (where: string) => `등록했어요 (${where}).`,
+    pathAlready: (where: string) => `이미 등록되어 있어요 (${where}).`,
+    pathRestart: '안티그래비티 같은 프로그램은 "완전히 껐다가 다시 켜야" 새 PATH를 받아요. 창만 닫거나 터미널만 새로 열면 적용되지 않아요.',
+    pathManual: '자동으로 등록하지 못했어요. 직접 해 주세요:',
   },
 
   home: {
@@ -404,6 +430,14 @@ export const ko = {
     ],
     faqTitle: '문제가 생겼을 때',
     faq: [
+      {
+        q: '안티그래비티 터미널에서 설치하면 어떤 사람은 되고 어떤 사람은 PATH 오류가 나요. 왜 그런가요?',
+        a: '공식 설치 프로그램은 claude를 "내 폴더\\.local\\bin"에 넣지만 PATH(명령을 찾는 폴더 목록)에는 추가하지 않아요. 그 폴더가 원래 PATH에 있던 컴퓨터는 바로 되고, 없던 컴퓨터는 "인식되지 않는 명령" 오류가 나요. 또 PATH를 고쳐도 이미 켜져 있던 안티그래비티의 터미널은 예전 PATH를 그대로 쓰기 때문에, 안티그래비티를 완전히 껐다 켜야 해요. 이 앱은 PATH에 기대지 않고 claude를 직접 찾고, [🔧 PATH에 등록하기]로 다른 프로그램에서도 쓸 수 있게 고쳐 줘요.',
+      },
+      {
+        q: '"이 시스템에서 스크립트를 실행할 수 없으므로…" 오류가 나요',
+        a: 'npm으로 설치한 claude(claude.ps1)가 PowerShell 실행 정책에 막힌 거예요. 학교·회사 PC에서 자주 생겨요. 이 앱의 [🪄 자동으로 설치하기]는 공식 설치 프로그램을 쓰고 이번 실행에만 허용하므로 이 문제가 없어요.',
+      },
       { q: '"Claude를 찾을 수 없어요"가 떠요', a: '설정 → Claude Code에서 [고르기]로 claude 실행 파일을 직접 지정하거나, 처음 화면의 설치 안내를 따라 다시 설치해 보세요.' },
       { q: '이어서 하기가 안 돼요', a: '폴더를 옮겼다면 처음 화면의 폴더 카드에서 [📍 새 위치 지정]을 눌러 주세요. Claude Code의 대화 기록은 원래 폴더 위치에 묶여 있어요.' },
       { q: '터미널에서 한글이 깨지거나 겹쳐 보여요', a: '터미널 아래 한글 입력창에 써서 [보내기]를 누르세요. 입력창이 안 보이면 설정 → 입력에서 켜 주세요.' },

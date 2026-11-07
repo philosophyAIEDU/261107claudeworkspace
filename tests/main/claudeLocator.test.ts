@@ -67,6 +67,24 @@ describe('claudeLocator', () => {
     expect(await checkClaude(onlyCmd)).toMatchObject({ found: true, version: '2.1.0' });
   });
 
+  it('PATH에 등록되지 않았어도 공식 설치 위치의 claude를 먼저 찾는다', async () => {
+    const d = deps({ env: { PATH: '/usr/bin' }, files: ['/usr/bin/claude', '/Users/hong/.local/bin/claude'] });
+    expect(await findClaude(d)).toBe('/Users/hong/.local/bin/claude');
+  });
+
+  it('Windows: Claude 데스크톱 앱의 WindowsApps\\Claude.exe는 CLI가 아니므로 건너뛴다', async () => {
+    const decoy = 'C:\\Users\\홍길동\\AppData\\Local\\Microsoft\\WindowsApps\\claude.exe';
+    const npmCmd = 'C:\\Users\\홍길동\\AppData\\Roaming\\npm\\claude.cmd';
+    const d = deps({
+      platform: 'win32',
+      homeDir: 'C:\\Users\\홍길동',
+      env: { PATH: 'C:\\Windows' },
+      files: [decoy, npmCmd],
+      runs: { 'where claude': { code: 0, stdout: `${decoy}\r\n${npmCmd}\r\n`, stderr: '' } },
+    });
+    expect(await findClaude(d)).toBe(npmCmd);
+  });
+
   it('parseVersion', () => {
     expect(parseVersion('2.1.230 (Claude Code)')).toBe('2.1.230');
     expect(parseVersion('nothing')).toBeNull();

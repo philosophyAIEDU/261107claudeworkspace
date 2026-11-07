@@ -52,16 +52,25 @@ export function knownLocations(deps: LocatorDeps): string[] {
   ];
 }
 
+/** Claude 데스크톱 앱이 WindowsApps에 등록한 Claude.exe는 CLI가 아니므로 건너뛴다(공식 문제 해결 문서 참고). */
+export function isDecoy(p: string): boolean {
+  return /[\\/]WindowsApps[\\/]/i.test(p);
+}
+
 /**
- * claude 실행 파일을 찾는다.
- * 순서: 사용자가 설정에서 지정한 경로 → PATH(Windows는 `where claude` 결과 포함) → 흔한 설치 위치.
- * Windows는 .exe(네이티브 설치)를 .cmd(npm 설치)보다 먼저 고른다.
+ * claude 실행 파일을 찾는다. PATH에 기대지 않는다.
+ * 순서: 사용자가 설정에서 지정한 경로 → 공식 설치 위치(~/.local/bin) → PATH(Windows는 `where claude` 결과 포함)
+ *       → 그 밖의 흔한 설치 위치.
+ * PATH가 등록되지 않았거나(설치 프로그램은 PATH를 고치지 않음) 앱이 켜진 뒤에 설치했어도 찾을 수 있다.
+ * Windows는 .exe(네이티브 설치)를 .cmd(npm 설치)보다 먼저 고른다. npm이 만드는 claude.ps1은
+ * 실행 정책(ExecutionPolicy) 때문에 막힐 수 있어 쓰지 않는다.
  */
 export async function findClaude(deps: LocatorDeps, customPath?: string): Promise<string | null> {
   if (customPath) return (await deps.exists(customPath)) ? customPath : null;
   const p = api(deps.platform);
   const names = deps.platform === 'win32' ? ['claude.exe', 'claude.cmd', 'claude.bat'] : ['claude'];
-  const candidates: string[] = [];
+  const known = knownLocations(deps);
+  const candidates: string[] = [known[0]!];
   if (deps.platform === 'win32') {
     const where = await deps.run('where', ['claude'], 5000).catch(() => null);
     if (where && where.code === 0) {
@@ -72,8 +81,8 @@ export async function findClaude(deps: LocatorDeps, customPath?: string): Promis
     }
   }
   for (const name of names) for (const dir of pathDirs(deps)) candidates.push(p.join(dir, name));
-  candidates.push(...knownLocations(deps));
-  for (const c of candidates) if (await deps.exists(c)) return c;
+  candidates.push(...known.slice(1));
+  for (const c of candidates) if (!isDecoy(c) && (await deps.exists(c))) return c;
   return null;
 }
 

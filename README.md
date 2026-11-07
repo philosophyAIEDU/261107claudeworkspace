@@ -23,7 +23,7 @@ Claude Code 설치 명령(공식 안내: https://code.claude.com/docs/en/setup):
 - **Windows (PowerShell)**: `irm https://claude.ai/install.ps1 | iex`
 - **macOS (터미널)**: `curl -fsSL https://claude.ai/install.sh | bash`
 
-> 앱을 처음 켜면 "시작하기 전에 확인해요" 화면이 Claude Code 설치 여부를 자동으로 확인해 주고, 없으면 설치 방법을 단계별로 보여 줘요.
+> 앱을 처음 켜면 "시작하기 전에 확인해요" 화면이 Claude Code 설치 여부를 자동으로 확인해요. 없으면 **[🪄 자동으로 설치하기]** 버튼으로 위 공식 설치 명령을 앱 안에서 대신 실행해요. 설치가 끝나면 PATH와 상관없이 바로 쓸 수 있고, 다른 프로그램(안티그래비티 등)에서도 쓰고 싶으면 **[🔧 PATH에 등록하기]**를 누르면 돼요.
 
 ---
 
@@ -115,6 +115,20 @@ npm run dist:mac    # macOS 설치 파일 (.dmg) — 맥에서 실행해야 해�
    - Windows 예: `C:\Users\내이름\.local\bin\claude.exe` 또는 `C:\Users\내이름\AppData\Roaming\npm\claude.cmd`
    - macOS 예: `/Users/내이름/.local/bin/claude` 또는 `/opt/homebrew/bin/claude`
 3. 설치 직후라면 앱을 껐다 켜요.
+
+### 안티그래비티(또는 VS Code) 터미널에서 설치하면 어떤 사람은 되고 어떤 사람은 PATH 오류가 나요
+`'claude' 용어가 cmdlet, 함수, 스크립트 파일 또는 실행할 수 있는 프로그램 이름으로 인식되지 않습니다` 같은 오류예요. 사람마다 다른 이유는 다음과 같아요.
+
+1. **설치 프로그램은 PATH를 고치지 않아요.** 공식 설치 명령은 claude를 `내 폴더\.local\bin`(macOS: `~/.local/bin`)에 넣고, PATH(명령을 찾는 폴더 목록)에 없으면 "not in your PATH"라는 안내만 보여 줘요. 그 폴더가 **원래 PATH에 들어 있던 컴퓨터**(다른 개발 도구가 미리 넣어 둔 경우 등)는 바로 되고, **없던 컴퓨터**는 오류가 나요.
+2. **PATH를 고쳐도 IDE를 완전히 다시 켜야 해요.** 안티그래비티 안의 터미널은 안티그래비티가 *켜질 때* 받아 둔 PATH를 그대로 물려받아요. 터미널만 새로 열거나 창만 닫으면 적용되지 않고, 프로그램을 완전히 종료했다가 다시 켜야 해요. 그래서 "껐다 켠 사람은 되고 안 한 사람은 안 되는" 차이가 생겨요.
+3. **npm으로 설치한 경우 실행 정책에 막혀요.** `npm install -g`로 설치하면 `claude.ps1`이 만들어지는데, 학교·회사 PC처럼 PowerShell 스크립트 실행이 막힌 컴퓨터에서는 "이 시스템에서 스크립트를 실행할 수 없으므로…" 오류가 나요.
+4. **그 밖에:** 32비트 "Windows PowerShell (x86)"에서 설치하면 실패해요. 예전에 설치한 Claude 데스크톱 앱의 `Claude.exe`가 CLI 대신 실행되기도 해요. CMD에서 PowerShell 명령(`irm …`)을 넣어도 오류가 나요.
+
+**이 앱은 이렇게 해결해요**
+- **[🪄 자동으로 설치하기]**: 공식 설치 명령을 64비트 PowerShell로, 이번 한 번만 스크립트 실행을 허용해(`-ExecutionPolicy Bypass`) 실행해요. 학교·회사 PC의 정책을 바꾸지 않아요.
+- **PATH에 기대지 않아요**: 공식 설치 위치(`.local\bin`)를 직접 찾고, Claude 데스크톱 앱의 `Claude.exe`는 건너뛰어요. npm 설치본은 `claude.ps1` 대신 `claude.cmd`를 써서 실행 정책에 걸리지 않아요.
+- **앱을 다시 켤 필요가 없어요**: [다시 확인]을 누를 때마다 레지스트리(macOS는 로그인 셸)에서 최신 PATH를 다시 읽어요.
+- **[🔧 PATH에 등록하기]**: 공식 문서와 같은 방법으로 사용자 PATH에 폴더를 추가해요(Windows는 관리자 권한 불필요, macOS는 `~/.zshrc`에 한 줄 추가). 그 뒤 **안티그래비티를 완전히 껐다 켜면** 거기서도 `claude`가 돼요.
 
 ### "이어서 하기가 안 돼요" (폴더를 옮겼을 때)
 - Claude Code의 대화 기록은 **처음 대화를 시작한 폴더 위치에 묶여** 저장돼요. 그래서 이 앱은 항상 원래 폴더에서 이어서 해요.

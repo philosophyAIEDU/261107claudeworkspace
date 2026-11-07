@@ -90,49 +90,65 @@ export class PtyManager {
   }
 
   start(opts: StartOptions): PtyTabInfo {
-    const existing = this.tabs.get(opts.tabId);
-    if (existing?.pty) throw new Error(`tab ${opts.tabId} already running`);
-    if (existing) this.disposeTab(existing);
-
     const args = buildClaudeArgs(opts.launch);
     const cmd = resolveSpawnCommand(opts.claudePath, args, this.platform);
     // 이어서 하기는 반드시 그 대화를 시작한 폴더에서 실행해야 한다.
     // Claude Code는 작업 폴더별로 대화 기록을 나눠 저장하므로, 다른 폴더에서 --resume 하면
     // "대화를 찾을 수 없다"고 하거나(옛 버전) 엉뚱한 폴더에서 파일을 고치게 된다.
-    const pty = this.spawnPty(cmd.file, cmd.args, {
+    return this.spawnTab(
+      { tabId: opts.tabId, kind: 'claude', sessionId: opts.sessionId, workspaceId: opts.workspaceId, title: opts.title, running: true },
+      cmd.file,
+      cmd.args,
+      opts.workspacePath,
+      opts.cols,
+      opts.rows,
+      opts.env,
+    );
+  }
+
+  /**
+   * Claude Code 설치처럼 claude가 아닌 명령을 터미널에서 실행한다.
+   * 설치 중의 진행 상황·질문이 그대로 보이고, 사용자가 직접 답할 수도 있다.
+   */
+  startCommand(opts: { tabId: string; title: string; file: string; args: string[]; cwd: string; cols: number; rows: number; env: Record<string, string> }): PtyTabInfo {
+    return this.spawnTab(
+      { tabId: opts.tabId, kind: 'installer', sessionId: '', workspaceId: '', title: opts.title, running: true },
+      opts.file,
+      opts.args,
+      opts.cwd,
+      opts.cols,
+      opts.rows,
+      opts.env,
+    );
+  }
+
+  private spawnTab(info: PtyTabInfo, file: string, args: string[] | string, cwd: string, cols: number, rows: number, env: Record<string, string>): PtyTabInfo {
+    const existing = this.tabs.get(info.tabId);
+    if (existing?.pty) throw new Error(`tab ${info.tabId} already running`);
+    if (existing) this.disposeTab(existing);
+    const pty = this.spawnPty(file, args, {
       name: 'xterm-256color',
-      cwd: opts.workspacePath,
-      cols: opts.cols,
-      rows: opts.rows,
-      env: buildPtyEnv(opts.env, this.platform),
+      cwd,
+      cols,
+      rows,
+      env: buildPtyEnv(env, this.platform),
       useConpty: this.platform === 'win32' ? true : undefined,
     });
-    const tab: Tab = {
-      info: {
-        tabId: opts.tabId,
-        sessionId: opts.sessionId,
-        workspaceId: opts.workspaceId,
-        title: opts.title,
-        running: true,
-      },
-      pty,
-      buffer: [],
-      bufferSize: 0,
-      disposables: [],
-    };
+    const tab: Tab = { info: { ...info }, pty, buffer: [], bufferSize: 0, disposables: [] };
+    const tabId = info.tabId;
     tab.disposables.push(
       pty.onData((data) => {
         this.appendBuffer(tab, data);
-        for (const l of this.dataListeners) l(opts.tabId, data);
+        for (const l of this.dataListeners) l(tabId, data);
       }),
       pty.onExit(({ exitCode, signal }) => {
         tab.info.running = false;
         tab.info.exitCode = exitCode;
         tab.pty = null;
-        for (const l of this.exitListeners) l(opts.tabId, exitCode, signal);
+        for (const l of this.exitListeners) l(tabId, exitCode, signal);
       }),
     );
-    this.tabs.set(opts.tabId, tab);
+    this.tabs.set(tabId, tab);
     return { ...tab.info };
   }
 
@@ -203,11 +219,11 @@ export class PtyManager {
   }
 
   isSessionOpen(sessionId: string): boolean {
-    return [...this.tabs.values()].some((t) => t.info.sessionId === sessionId);
+    return !!sessionId && [...this.tabs.values()].some((t) => t.info.sessionId === sessionId);
   }
 
   findTabBySession(sessionId: string): PtyTabInfo | undefined {
-    const t = [...this.tabs.values()].find((x) => x.info.sessionId === sessionId);
+    const t = sessionId ? [...this.tabs.values()].find((x) => x.info.sessionId === sessionId) : undefined;
     return t ? { ...t.info } : undefined;
   }
 

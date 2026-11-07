@@ -119,6 +119,28 @@ describe('PtyManager', () => {
   });
 });
 
+describe('PtyManager.startCommand (설치용 터미널)', () => {
+  it('지정한 프로그램·인자·폴더로 실행하고 installer 종류로 표시한다', () => {
+    const { mgr, calls } = setup('win32');
+    const tab = mgr.startCommand({
+      tabId: 'i1',
+      title: 'Claude Code 설치',
+      file: 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+      args: ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', 'irm https://claude.ai/install.ps1 | iex'],
+      cwd: 'C:\\Users\\홍길동',
+      cols: 100,
+      rows: 30,
+      env: { Path: 'C:\\Windows' },
+    });
+    expect(tab).toMatchObject({ kind: 'installer', running: true, sessionId: '' });
+    expect(calls[0]!.file).toContain('powershell.exe');
+    expect(calls[0]!.args).toContain('Bypass');
+    expect(calls[0]!.opts.cwd).toBe('C:\\Users\\홍길동');
+    // 설치 탭은 어떤 대화로도 "열려 있음"으로 잡히지 않는다
+    expect(mgr.isSessionOpen('')).toBe(false);
+  });
+});
+
 describe('buildPtyEnv', () => {
   it('Electron·중첩 Claude 변수를 빼고 UTF-8과 색상 설정을 넣는다', () => {
     const env = buildPtyEnv({ PATH: '/bin', ELECTRON_RUN_AS_NODE: '1', CLAUDECODE: '1', LANG: 'C' }, 'darwin');

@@ -1,5 +1,7 @@
 import { existsSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { withDirsOnPath } from '../env/pathTools';
 import type { SessionRecord } from '../../shared/types';
 import { UserError } from '../errors';
 import { defaultSessionTitle, sanitizeTitle, type ClaudeLaunch } from '../claude/commandBuilder';
@@ -96,7 +98,9 @@ export function registerPtyHandlers(ctx: MainContext): void {
       claudePath: check.path,
       cols,
       rows,
-      env: await ctx.getEnv(),
+      // claude가 든 폴더를 PATH 맨 앞에 넣는다. PATH가 등록되지 않은 컴퓨터에서도
+      // Claude Code가 자기 자신(업데이트·하위 작업 등)을 찾을 수 있게 하기 위함.
+      env: withDirsOnPath(await ctx.getEnv(), [path.dirname(check.path)], ctx.platform),
     });
 
     ctx.send('sessions:changed', undefined);

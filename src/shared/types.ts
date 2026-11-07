@@ -98,6 +98,25 @@ export interface ClaudeCheckResult {
   path?: string;
   version?: string;
   error?: string;
+  /** claude가 들어 있는 폴더 */
+  dir?: string;
+  /**
+   * 그 폴더가 "저장된 PATH"(새 터미널·다른 IDE가 받는 값)에 있는지.
+   * false면 이 앱에서는 되지만 안티그래비티 등의 터미널에서는 'claude'를 못 찾는다. 확인 못 하면 undefined.
+   */
+  onPath?: boolean;
+}
+
+export interface InstallerStartResult {
+  tabId: string;
+  command: string;
+}
+
+export interface PathFixResult {
+  ok: boolean;
+  where?: string;
+  alreadyDone?: boolean;
+  manual?: string;
 }
 
 export interface AppInfo {
@@ -118,6 +137,8 @@ export type PermissionMode = 'default' | 'acceptEdits' | 'plan';
 
 export interface PtyTabInfo {
   tabId: string;
+  /** 'installer'는 Claude Code 설치용 터미널(대화 탭 목록에는 보이지 않음) */
+  kind?: 'claude' | 'installer';
   sessionId: string;
   workspaceId: string;
   title: string;

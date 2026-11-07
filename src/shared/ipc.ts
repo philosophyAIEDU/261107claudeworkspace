@@ -9,6 +9,8 @@ import type {
   FileReadResult,
   HistoryResult,
   ImportScanResult,
+  InstallerStartResult,
+  PathFixResult,
   PtyStartResult,
   PtyTabInfo,
   SearchHit,
@@ -29,6 +31,8 @@ export interface IpcResponseMap {
   'app:cancelQuit': void;
   'setup:checkClaude': ClaudeCheckResult;
   'setup:pickClaudePath': ClaudeCheckResult | null;
+  'setup:runInstaller': InstallerStartResult;
+  'setup:fixPath': PathFixResult;
   'settings:get': AppSettings;
   'settings:update': AppSettings;
   'settings:pickFolder': string | null;

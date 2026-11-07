@@ -10,7 +10,8 @@ import { loadSessionSdk } from './claude/sdk';
 import { checkClaude } from './claude/claudeLocator';
 import { makeLocatorDeps } from './claude/locatorDeps';
 import { ClaudeProjectsWatcher, debounce } from './claude/claudeWatcher';
-import { getShellEnv } from './env/shellEnv';
+import { getShellEnv, invalidateShellEnv, readPersistentPath } from './env/shellEnv';
+import { isDirOnPath } from './env/pathTools';
 import { installIpcRouter } from './ipc/handle';
 import type { MainContext } from './ipc/context';
 import { registerWorkspaceHandlers, refreshMissing } from './ipc/workspaces';
@@ -108,8 +109,16 @@ async function main(): Promise<void> {
     getEnv: getShellEnv,
     checkClaude: async (force = false) => {
       if (!force && claudeCache && Date.now() - claudeCache.at < 60_000 && claudeCache.result.found) return claudeCache.result;
+      // 다시 확인할 때는 PATH도 새로 읽는다(앱이 켜진 뒤에 설치했거나 PATH를 고쳤을 수 있으므로).
+      if (force) invalidateShellEnv();
       const deps = await makeLocatorDeps(ctx);
       const result = await checkClaude(deps, store.get().settings.claudePath);
+      if (result.found && result.path) {
+        result.dir = path.dirname(result.path);
+        // 다른 프로그램(안티그래비티 등)의 새 터미널이 받게 될 PATH에 이 폴더가 있는지 확인한다.
+        const persistent = await readPersistentPath().catch(() => null);
+        result.onPath = persistent === null ? undefined : isDirOnPath(persistent, result.dir, process.platform);
+      }
       claudeCache = { at: Date.now(), result };
       return result;
     },

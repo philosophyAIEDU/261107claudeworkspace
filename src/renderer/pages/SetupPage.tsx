@@ -6,12 +6,15 @@ import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button';
 import { HelpTip } from '../components/Tooltip';
 import { ImportPanel } from '../features/sessions/ImportPanel';
+import { InstallerDialog } from '../features/setup/InstallerDialog';
+import { ClaudePathStatus } from '../features/setup/ClaudePathStatus';
 
 /** 첫 실행 화면 "시작하기 전에 확인해요" */
 export function SetupPage({ onDone }: { onDone: () => void }): React.JSX.Element {
   const { info } = useApp();
   const [check, setCheck] = useState<ClaudeCheckResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [installing, setInstalling] = useState(false);
   const isWin = info?.platform === 'win32';
   const steps = isWin ? ko.setup.installWin : ko.setup.installMac;
   const cmd = isWin ? ko.setup.installCmdWin : ko.setup.installCmdMac;
@@ -44,13 +47,23 @@ export function SetupPage({ onDone }: { onDone: () => void }): React.JSX.Element
             <div>
               <p className="text-lg font-semibold text-ok">{ko.setup.found(check.version ?? '?')}</p>
               {check.path && <p className="text-sm text-muted">{ko.setup.foundAt(check.path)}</p>}
+              <ClaudePathStatus check={check} />
             </div>
           )}
           {check && !check.found && (
             <div className="flex flex-col gap-3">
               <p className="text-lg font-semibold text-danger">{ko.setup.notFoundTitle}</p>
               {check.error && <p className="text-muted">{check.error}</p>}
-              <h3 className="font-semibold">{ko.setup.installStepsTitle}</h3>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="primary" size="lg" onClick={() => setInstalling(true)} disabled={info?.ptyAvailable === false}>
+                  {ko.setup.autoInstall}
+                </Button>
+                <HelpTip text={ko.setup.autoInstallHelp} />
+              </div>
+              <p className="text-sm text-muted">{ko.setup.autoInstallHelp}</p>
+              <details className="rounded-lg border border-line p-3">
+              <summary className="cursor-pointer font-medium">{ko.setup.manualInstall}</summary>
+              <h3 className="mt-2 font-semibold">{ko.setup.installStepsTitle}</h3>
               <ol className="list-decimal pl-6">
                 {steps.map((s) => (
                   <li key={s} className="mb-1">
@@ -77,6 +90,7 @@ export function SetupPage({ onDone }: { onDone: () => void }): React.JSX.Element
                   {ko.setup.docsLink} ↗
                 </button>
               </div>
+              </details>
             </div>
           )}
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -104,6 +118,8 @@ export function SetupPage({ onDone }: { onDone: () => void }): React.JSX.Element
           <h2 className="mb-2 text-xl font-semibold">3. {ko.setup.importTitle}</h2>
           <ImportPanel />
         </section>
+
+        {installing && <InstallerDialog onClose={() => setInstalling(false)} onChecked={setCheck} />}
 
         <div className="flex justify-end">
           <Button variant="primary" size="lg" onClick={onDone}>
