@@ -45,11 +45,15 @@
   }
 
   if (window.fetch) {
-    fetch('https://api.github.com/repos/' + REPO + '/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+    // releases/latest는 릴리스가 없으면 404를 돌려줘 콘솔에 빨간 오류가 남는다.
+    // 목록 주소는 릴리스가 없어도 200과 빈 목록을 돌려주므로 이것을 쓴다(최신순 정렬).
+    fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=5', { headers: { Accept: 'application/vnd.github+json' } })
       .then(function (res) {
-        if (res.status === 404) return null;
         if (!res.ok) throw new Error('status ' + res.status);
         return res.json();
+      })
+      .then(function (list) {
+        return (list || []).filter(function (r) { return !r.draft && !r.prerelease; })[0] || null;
       })
       .then(function (release) {
         if (!release) {
