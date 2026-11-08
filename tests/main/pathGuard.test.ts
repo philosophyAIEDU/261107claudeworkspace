@@ -29,7 +29,8 @@ describe('pathGuard (문자열 기준)', () => {
 });
 
 describe('pathGuard (실제 파일 시스템)', () => {
-  it('심볼릭 링크로 밖을 가리키는 꼼수를 막는다', () => {
+  // Windows에서 폴더 심볼릭 링크를 만들려면 개발자 모드·관리자 권한이 필요해 건너뛴다.
+  it.skipIf(process.platform === 'win32')('심볼릭 링크로 밖을 가리키는 꼼수를 막는다', () => {
     const base = mkdtempSync(path.join(os.tmpdir(), 'pcw-guard-'));
     const ws = path.join(base, '수업 자료');
     const outside = path.join(base, '비밀');

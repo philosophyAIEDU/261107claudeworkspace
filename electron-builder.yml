@@ -3,13 +3,6 @@ appId: kr.philosophyai.claude-workroom
 productName: 필로소피 Claude 작업실
 copyright: Copyright © 2026 Philosophy AI Education
 
-# GitHub Releases에 설치 파일을 올린다 (.github/workflows/release.yml에서 사용).
-publish:
-  provider: github
-  owner: philosophyAIEDU
-  repo: 261107claudeworkspace
-  releaseType: release
-
 directories:
   output: release
   buildResources: build

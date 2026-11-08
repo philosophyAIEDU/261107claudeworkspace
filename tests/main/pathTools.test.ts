@@ -66,7 +66,8 @@ describe('macOS·Linux 셸 설정 파일', () => {
     expect(profileAlreadyHas('# export PATH=$HOME/.local/bin:$PATH\n', '/Users/h/.local/bin', '/Users/h')).toBe(false);
   });
 
-  it('addDirToUserPath: 설정 파일에 한 번만 덧붙인다', async () => {
+  // macOS·Linux 전용 동작(셸 설정 파일)이라 Windows에서는 건너뛴다.
+  it.skipIf(process.platform === 'win32')('addDirToUserPath: 설정 파일에 한 번만 덧붙인다', async () => {
     const home = mkdtempSync(path.join(os.tmpdir(), 'pcw-home-'));
     writeFileSync(path.join(home, '.zshrc'), 'alias ll="ls -l"');
     const dir = path.join(home, '.local/bin');
