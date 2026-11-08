@@ -18,6 +18,17 @@ files:
   - "!**/*.{pdb,map,md,ts}"
   - "!**/{test,tests,__tests__,example,examples}/**"
 
+# 보안 퓨즈(Electron Fuses): 실행 파일 안에 새겨 두는 보안 스위치.
+# 설치된 앱을 다른 프로그램이 "Node.js 실행기"나 디버깅 통로로 악용하지 못하게 막는다.
+# (악성코드가 서명된 Electron 앱을 빌려 쓰는 수법을 막아, 백신이 의심하는 동작도 줄인다)
+electronFuses:
+  runAsNode: false                          # ELECTRON_RUN_AS_NODE로 앱을 Node 실행기처럼 쓰는 것 차단
+  enableNodeOptionsEnvironmentVariable: false   # NODE_OPTIONS로 코드 주입 차단
+  enableNodeCliInspectArguments: false      # --inspect 디버거 연결 차단
+  enableCookieEncryption: true              # 저장되는 쿠키 암호화
+  enableEmbeddedAsarIntegrityValidation: true   # 앱 파일(app.asar)이 바뀌면 실행 거부 (Windows·macOS)
+  onlyLoadAppFromAsar: true                 # app.asar 밖의 코드로 바꿔치기 차단
+
 # node-pty는 네이티브 모듈이라 asar 압축 파일 밖으로 풀어 둬야 불러올 수 있다.
 asarUnpack:
   - node_modules/node-pty/**
@@ -49,8 +60,10 @@ mac:
       arch: [x64, arm64]
   category: public.app-category.education
   artifactName: "PhilosophyClaudeWorkroom-mac-${arch}.${ext}"
-  # 코드 서명이 없을 때도 빌드되도록 (서명은 인증서가 준비된 뒤에)
-  identity: null
+  # 공증(notarization)에 필요한 강화된 런타임. 권한(entitlements)은 electron-builder 기본값을 쓴다
+  # (Electron의 JIT 등에 필요한 최소 권한).
+  # 인증서(CSC_LINK)가 없으면 서명 없이 빌드되고, 있으면 자동으로 서명·공증한다(.github/workflows/release.yml 참고).
+  hardenedRuntime: true
 
 dmg:
   title: 필로소피 Claude 작업실

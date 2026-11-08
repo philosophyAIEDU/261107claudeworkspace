@@ -208,6 +208,12 @@
             <p>Claude Code의 대화 기록은 처음 대화를 시작한 폴더 위치에 묶여 있어요. 처음 화면의 폴더 카드에서 <strong>[📍 새 위치 지정]</strong>으로 옮긴 폴더를 골라 주세요.</p>
           </details>
           <details>
+            <summary>바이러스는 아닌가요? 설치할 때 경고가 떠요.</summary>
+            <p>경고는 아직 <strong>코드 서명(발행자 증명)</strong>이 없어서 뜨는 거예요. 설치 파일은 GitHub가 공개된 소스 코드로 직접 만들고, 릴리스마다 <strong>파일 지문(SHA-256)</strong>과 <strong>GitHub 빌드 증명</strong>을 함께 올려요. 받은 파일의 지문이 <a href="https://github.com/philosophyAIEDU/261107claudeworkspace/releases">릴리스 페이지</a>에 적힌 값과 같으면 바뀌지 않은 원본이에요.</p>
+            <p>Windows(PowerShell)에서 지문 보기: <code>Get-FileHash .\PhilosophyClaudeWorkroom-Setup.exe</code></p>
+            <p>앱의 보안 장치와 확인 방법은 <a href="https://github.com/philosophyAIEDU/261107claudeworkspace/blob/ccr-ef6a2cf0-ultmg7/SECURITY.md">보안 안내</a>에 정리해 두었어요.</p>
+          </details>
+          <details>
             <summary>대화 내용이 인터넷 어딘가에 저장되나요?</summary>
             <p>이 앱은 대화 내용을 어디에도 보내지 않아요. 대화는 Claude Code가 평소처럼 처리하고, 기록은 내 컴퓨터에 남아요. 이 앱은 그 기록의 목록(색인)만 내 컴퓨터에 저장해요.</p>
           </details>

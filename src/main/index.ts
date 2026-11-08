@@ -25,6 +25,8 @@ const isMac = process.platform === 'darwin';
 const DEV_URL = process.env.ELECTRON_RENDERER_URL;
 
 app.setName('필로소피 Claude 작업실');
+// 모든 화면(렌더러)을 운영체제 샌드박스 안에서 실행한다.
+app.enableSandbox();
 // 앱 데이터 위치를 고정한다. (Windows: %APPDATA%\필로소피 Claude 작업실, macOS: ~/Library/Application Support/필로소피 Claude 작업실)
 app.setPath('userData', path.join(app.getPath('appData'), '필로소피 Claude 작업실'));
 
@@ -200,7 +202,7 @@ async function main(): Promise<void> {
     });
   });
 
-  installKoreanMenu(isMac);
+  installKoreanMenu(isMac, !app.isPackaged);
 
   const createWindow = (): void => {
     const b = restoreBounds(store);
@@ -222,6 +224,8 @@ async function main(): Promise<void> {
         sandbox: true,
         webSecurity: true,
         spellcheck: false,
+        // 설치된 앱에서는 개발자 도구를 열 수 없게 한다(화면을 몰래 조작하는 통로를 줄임).
+        devTools: !app.isPackaged,
       },
     });
     if (b.maximized) mainWindow.maximize();

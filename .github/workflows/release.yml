@@ -5,6 +5,14 @@
 # 태그를 직접 올리기 어려우면 Actions 탭에서 이 워크플로를 수동 실행(Run workflow)하고
 # version에 v0.1.0처럼 적어도 된다. 그러면 지금 커밋에 그 태그와 릴리스를 GitHub가 만들어 준다.
 # (version을 비워 두면 설치 파일만 만들어 Actions 결과물로 남긴다)
+#
+# 보안
+# - 외부 작업(actions)은 태그가 아니라 커밋 SHA로 고정한다. 누가 태그를 바꿔치기해도 영향을 받지 않는다.
+# - 권한은 필요한 작업에만 준다. 빌드는 읽기만, 릴리스 작업만 쓰기 권한을 가진다.
+# - 릴리스에 SHA256SUMS.txt(파일 지문)와 GitHub 빌드 증명(attestation)을 함께 올려,
+#   받은 파일이 이 저장소에서 이 워크플로로 만든 그대로인지 누구나 확인할 수 있다.
+# - 코드 서명: 아래 Secrets/Variables가 저장소에 등록되어 있으면 자동으로 서명한다. 없으면 서명 없이 빌드한다.
+#   (설정 방법: SECURITY.md의 "코드 서명 켜기")
 name: release
 
 on:
@@ -18,7 +26,7 @@ on:
         default: ''
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -34,19 +42,72 @@ jobs:
             files: release/*.dmg
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
       - run: npm ci
+      # 앱에 들어가는 라이브러리에 알려진 보안 문제(높음 이상)가 있으면 빌드를 멈춘다
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run typecheck
       - run: npm run test
-      # 코드 서명 인증서가 아직 없으므로 macOS 자동 서명 찾기를 끈다
-      - run: npm run ${{ matrix.script }} -- --publish never
+      - name: 설치 파일 만들기 (인증서가 등록되어 있으면 서명까지)
+        shell: bash
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - uses: actions/upload-artifact@v4
+          # Windows 방법 1) 인증서 파일(.pfx)
+          S_WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          S_WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          # Windows 방법 2) Azure Artifact Signing(Trusted Signing)
+          S_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          S_AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          S_AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          V_AZURE_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          V_AZURE_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          V_AZURE_PROFILE: ${{ vars.AZURE_SIGNING_PROFILE }}
+          V_AZURE_PUBLISHER: ${{ vars.AZURE_SIGNING_PUBLISHER }}
+          # macOS) Developer ID 인증서 + 공증(notarization)
+          S_MAC_CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          S_MAC_CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          S_APPLE_ID: ${{ secrets.APPLE_ID }}
+          S_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          S_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          RUNNER_KIND: ${{ runner.os }}
+          SCRIPT: ${{ matrix.script }}
+        run: |
+          args=(--publish never)
+          if [ "$RUNNER_KIND" = "Windows" ]; then
+            if [ -n "$S_WIN_CSC_LINK" ]; then
+              echo "Windows: 인증서 파일로 서명해요"
+              export WIN_CSC_LINK="$S_WIN_CSC_LINK" WIN_CSC_KEY_PASSWORD="$S_WIN_CSC_KEY_PASSWORD"
+            elif [ -n "$S_AZURE_CLIENT_SECRET" ] && [ -n "$V_AZURE_ENDPOINT" ]; then
+              echo "Windows: Azure Artifact Signing으로 서명해요"
+              export AZURE_TENANT_ID="$S_AZURE_TENANT_ID" AZURE_CLIENT_ID="$S_AZURE_CLIENT_ID" AZURE_CLIENT_SECRET="$S_AZURE_CLIENT_SECRET"
+              args+=("-c.win.azureSignOptions.endpoint=$V_AZURE_ENDPOINT"
+                     "-c.win.azureSignOptions.codeSigningAccountName=$V_AZURE_ACCOUNT"
+                     "-c.win.azureSignOptions.certificateProfileName=$V_AZURE_PROFILE"
+                     "-c.win.azureSignOptions.publisherName=$V_AZURE_PUBLISHER")
+            else
+              echo "::warning::Windows 코드 서명 정보가 없어 서명 없이 빌드해요 (SmartScreen 경고가 뜰 수 있어요)"
+            fi
+          else
+            if [ -n "$S_MAC_CSC_LINK" ]; then
+              echo "macOS: Developer ID로 서명해요"
+              export CSC_LINK="$S_MAC_CSC_LINK" CSC_KEY_PASSWORD="$S_MAC_CSC_KEY_PASSWORD"
+              if [ -n "$S_APPLE_ID" ]; then
+                echo "macOS: 공증(notarization)까지 해요"
+                export APPLE_ID="$S_APPLE_ID" APPLE_APP_SPECIFIC_PASSWORD="$S_APPLE_APP_SPECIFIC_PASSWORD" APPLE_TEAM_ID="$S_APPLE_TEAM_ID"
+              fi
+            else
+              echo "::warning::macOS 서명 정보가 없어 서명 없이 빌드해요 (Gatekeeper 경고가 떠요)"
+              export CSC_IDENTITY_AUTO_DISCOVERY=false
+              args+=("-c.mac.identity=null")
+            fi
+          fi
+          npm run "$SCRIPT" -- "${args[@]}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: installers-${{ matrix.os }}
           path: ${{ matrix.files }}
@@ -57,24 +118,47 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && startsWith(inputs.version, 'v'))
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 릴리스 만들기
+      id-token: write # 빌드 증명 서명
+      attestations: write # 빌드 증명 저장
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: dist
           merge-multiple: true
-      - run: ls -la dist
+      - name: 파일 지문(SHA-256) 만들기
+        working-directory: dist
+        run: |
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+      - name: 빌드 증명(attestation) 남기기
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: 'dist/*.exe, dist/*.dmg'
       - name: GitHub 릴리스 만들기
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}
+          REPO: ${{ github.repository }}
         run: |
-          cat > notes.md <<'NOTES'
-          ## 내려받기
-          - **Windows 10/11**: `PhilosophyClaudeWorkroom-Setup.exe`
-          - **macOS (애플 실리콘 M1~M4)**: `PhilosophyClaudeWorkroom-mac-arm64.dmg`
-          - **macOS (인텔)**: `PhilosophyClaudeWorkroom-mac-x64.dmg`
-
-          아직 코드 서명이 없어서 처음 실행할 때 경고가 떠요. README의 "서명 없는 앱 실행 경고 넘기기"를 참고하세요.
-          Claude Code가 없다면 앱 첫 화면의 [🪄 자동으로 설치하기]를 누르면 돼요.
-          NOTES
+          {
+            echo '## 내려받기'
+            echo '- **Windows 10/11**: `PhilosophyClaudeWorkroom-Setup.exe`'
+            echo '- **macOS (애플 실리콘 M1~M4)**: `PhilosophyClaudeWorkroom-mac-arm64.dmg`'
+            echo '- **macOS (인텔)**: `PhilosophyClaudeWorkroom-mac-x64.dmg`'
+            echo
+            echo '## 안전하게 받았는지 확인하기'
+            echo '아래 SHA-256 지문이 내려받은 파일과 같으면, 이 저장소에서 만든 파일 그대로예요.'
+            echo '- Windows(PowerShell): `Get-FileHash .\PhilosophyClaudeWorkroom-Setup.exe -Algorithm SHA256`'
+            echo '- macOS(터미널): `shasum -a 256 PhilosophyClaudeWorkroom-mac-arm64.dmg`'
+            echo
+            echo '```'
+            cat dist/SHA256SUMS.txt
+            echo '```'
+            echo
+            echo "GitHub CLI가 있다면 \`gh attestation verify <파일> --repo $REPO\`로 이 워크플로에서 만든 파일인지 확인할 수 있어요."
+            echo
+            echo '아직 코드 서명이 없다면 처음 실행할 때 경고가 떠요. 자세한 내용은 저장소의 SECURITY.md를 봐 주세요.'
+          } > notes.md
           gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "필로소피 Claude 작업실 $TAG" --notes-file notes.md

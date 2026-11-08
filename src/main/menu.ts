@@ -1,7 +1,7 @@
 import { app, Menu, type MenuItemConstructorOptions } from 'electron';
 
 /** 한국어 메뉴. macOS에서는 '편집' 메뉴가 있어야 복사·붙여넣기 단축키가 동작한다. */
-export function installKoreanMenu(isMac: boolean): void {
+export function installKoreanMenu(isMac: boolean, devTools: boolean): void {
   const template: MenuItemConstructorOptions[] = [
     ...(isMac
       ? ([
@@ -39,7 +39,7 @@ export function installKoreanMenu(isMac: boolean): void {
       label: '보기',
       submenu: [
         { role: 'reload', label: '화면 새로 고침' },
-        { role: 'toggleDevTools', label: '개발자 도구' },
+        ...(devTools ? ([{ role: 'toggleDevTools', label: '개발자 도구' }] as MenuItemConstructorOptions[]) : []),
         { type: 'separator' },
         { role: 'togglefullscreen', label: '전체 화면' },
       ],
